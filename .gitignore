@@ -8,6 +8,5 @@ old_models
 *.p
 __pycache__
 *.csv
-*.ipynb
 README_old.md
 writeup_template.md
