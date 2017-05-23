@@ -123,7 +123,7 @@ And the image below shows the lane lines after the transformation.
 
 #### 5. Fitting a polynomial to lane lines
 
-Following the suggestions on the project I wrote two different functions to find lane lines, a more robust one that relies on histogram of image binaries to find X and Y points for each lane line and a "recursve" version that uses the line found on the previous frame as the baseline to where to look for lines in the current frame.
+Following the suggestions on the project I wrote two different functions to find lane lines, a more robust one that relies on histogram of image binaries to find X and Y points for each lane line and a "recursive" version that uses the line found on the previous frame as the baseline to where to look for lines in the current frame.
 
 The code for this two functions can be found on pipeline.py at rows 7 and 121.
 
