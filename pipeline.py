@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from image_functions import color_mask, sobel, perspective_transform
+from image_functions import new_color_mask, new_perspective_transform
 from laneline import Line
 
 
@@ -590,6 +591,37 @@ def video_pipeline(img, leftline, rightline, use_sobel=True):
 
     # Find lane lines
     left_fit, right_fit, out_img = find_lane_lines(leftline, rightline, warped, nwindows=9, margin=100, return_img=True, plot_boxes=False, plot_line=False, verbose=0)
+
+    # Find curvature
+    R = get_lane_curvature(leftline, rightline)
+
+    # Find lane offset
+    lane_offset = get_lane_offset(left_fit, right_fit)
+
+    result = plot_lanelines(img, warped, left_fit, right_fit, Minv, out_img, R=R, lane_offset=lane_offset)
+
+    return result
+
+
+def new_video_pipeline(img, leftline, rightline):
+    """
+    This function applies our pipeline to the frames of a video stream that is captured
+    using VideoFileClip.fl_image. The user needs to initialize two instances of lanelines
+    befor using this pipeline and call them leftline and rightline.
+
+    To achieve more robust results this pipeline starts with the perspective
+    transform and relies in color thresholding from several different color spaces
+    instead of Sobel transform.
+    """
+
+    # Perspective Transform
+    warped, M, Minv = new_perspective_transform(img)
+
+    # Color masking
+    warped_bin = new_color_mask(warped)
+
+    # Find lane lines
+    left_fit, right_fit, out_img = find_lane_lines(leftline, rightline, warped_bin, nwindows=9, margin=100, return_img=True, plot_boxes=False, plot_line=False, verbose=0)
 
     # Find curvature
     R = get_lane_curvature(leftline, rightline)

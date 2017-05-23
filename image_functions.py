@@ -170,6 +170,48 @@ def color_mask(img, return_bin=False):
     return color_masked
 
 
+def new_color_mask(img):
+    """
+
+    New color mask fucntion that combines three different color space filters
+    to increasee detection accuracy.
+
+    """
+
+    hsv = HSV(img)
+    hls = HLS(img)
+    binary = np.zeros_like(img[:, :, 0])
+
+    # Yellow filter
+    lower_yellow = (15, 75, 75)
+    upper_yellow = (35, 255, 255)
+    hsv_y_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
+
+    lower_hls_yellow = (10, 0, 20)
+    upper_hls_yellow = (30, 255, 255)
+    hls_y_mask = cv2.inRange(hls, lower_hls_yellow, upper_hls_yellow)
+
+    # White filter
+    hsv_sensitivity = 75
+    lower_hsv_white = (0, 0, 255 - hsv_sensitivity)
+    upper_hsv_white = (180, 25, 255)
+    hsv_w_mask = cv2.inRange(hsv, lower_hsv_white, upper_hsv_white)
+
+    hls_sensitivity = 75
+    lower_hls_white = (0, 255 - hls_sensitivity, 0)
+    upper_hls_white = (255, 255, hls_sensitivity)
+    hls_w_mask = cv2.inRange(hls, lower_hls_white, upper_hls_white)
+
+    rgb_sensitivity = 55
+    lower_rgb_white = (255 - rgb_sensitivity, 255 - rgb_sensitivity, 255 - rgb_sensitivity)
+    upper_rgb_white = (255, 255, 255)
+    rgb_w_mask = cv2.inRange(img, lower_rgb_white, upper_rgb_white)
+
+    bit_layer = binary | hsv_y_mask | hls_y_mask | hsv_w_mask | hls_w_mask | rgb_w_mask
+
+    return bit_layer
+
+
 def sobel(img, orient='x', thres=(20, 100), input_format='RGB'):
 
     # Check if image has 3 channels as the only accepted formats are RGB or HSV
@@ -309,6 +351,33 @@ def perspective_transform(image, calc_points=True):
     dst[1] = [img_w, 0.]
     dst[2] = [img_w, img_h]
     dst[3] = [0., img_h]
+
+    # compute the perspective transform matrix and then apply it
+    M = cv2.getPerspectiveTransform(src, dst)
+    Minv = cv2.getPerspectiveTransform(dst, src)
+    warped = cv2.warpPerspective(image, M, (img_w, img_h))
+    return warped, M, Minv
+
+
+def new_perspective_transform(image):
+
+    img_w = image.shape[1]
+    img_h = image.shape[0]
+
+    src = np.zeros((4, 2), dtype=np.float32)
+
+    # New method:
+    src[0] = [np.uint(img_w / 2) - 55, np.uint(img_h / 2) + 100]
+    src[1] = [np.uint(img_w / 2 + 55), np.uint(img_h / 2) + 100]
+    src[2] = [np.uint(img_w * 5 / 6) + 60, img_h]
+    src[3] = [(np.uint(img_w / 6) - 10), img_h]
+
+    # Calculate the destination points
+    dst = np.zeros((4, 2), dtype=np.float32)
+    dst[0] = [np.uint(img_w / 4), 0]
+    dst[1] = [np.uint(img_w * 3 / 4), 0]
+    dst[2] = [np.uint(img_w * 3 / 4), img_h]
+    dst[3] = [np.uint(img_w / 4), img_h]
 
     # compute the perspective transform matrix and then apply it
     M = cv2.getPerspectiveTransform(src, dst)
