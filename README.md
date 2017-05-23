@@ -95,27 +95,27 @@ You can find the core details below, and more information on image_functions.py
 
 ```python
 # Source points
-src[0] = [np.uint(img_w * 0.375), np.uint(img_h * 2 / 3)]
-src[1] = [np.uint(img_w * 0.625), np.uint(img_h * 2 / 3)]
-src[2] = [img_w, img_h]
-src[3] = [0, img_h]
+src[0] = [np.uint(img_w / 2) - 55, np.uint(img_h / 2) + 100]
+src[1] = [np.uint(img_w / 2 + 55), np.uint(img_h / 2) + 100]
+src[2] = [np.uint(img_w * 5 / 6) + 60, img_h]
+src[3] = [(np.uint(img_w / 6) - 10), img_h]
 
 # Calculate the destination points
 dst = np.zeros((4, 2), dtype=np.float32)
-dst[0] = [0., 0.]
-dst[1] = [img_w, 0.]
-dst[2] = [img_w, img_h]
-dst[3] = [0., img_h]
+dst[0] = [np.uint(img_w / 4), 0]
+dst[1] = [np.uint(img_w * 3 / 4), 0]
+dst[2] = [np.uint(img_w * 3 / 4), img_h]
+dst[3] = [np.uint(img_w / 4), img_h]
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   |
 |:-------------:|:-------------:|
-| 480, 480      | 0, 0          |
-| 800, 480      | 1280, 0       |
-| 1280, 720     | 1280, 720     |
-| 0, 720        | 0, 720        |
+| 585, 460      | 320, 0       |
+| 695, 460      | 960, 0       |
+| 1126, 720     | 960, 720     |
+| 203, 720      | 320, 720     |
 
 And the image below shows the lane lines after the transformation.
 
